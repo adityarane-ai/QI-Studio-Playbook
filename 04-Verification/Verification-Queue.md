@@ -1,559 +1,204 @@
 # QI Studio Verification Queue
 
-> **Purpose:** Living register of QI Studio behavior that is understood well enough to document but is **not yet verified at runtime**.
->
-> This file is deliberately temporary for each item. When an item is confirmed, **remove it from this queue and move the confirmed knowledge into the relevant canonical node documentation and evidence record**.
+**Purpose:** Active questions only. When a question is answered by a reproducible runtime test or stronger authoritative evidence, move the result into the relevant evidence/canonical document and remove the item here.
 
-## Operating rule
-
-The playbook uses five evidence states:
-
-| State | Meaning |
-|---|---|
-| **Observed** | Visible in screenshots/UI. |
-| **Documented** | Explicitly stated in supplied QI Studio/product guidance. |
-| **Verified** | Confirmed by a reproducible runtime test. |
-| **Inferred** | Reasonable engineering interpretation that still needs proof. |
-| **Open Question** | Behavior not yet established. |
-
-An item may be **Observed + Documented** and still belong in this queue until a runtime test confirms it.
-
-## Verification lifecycle
+## Evidence lifecycle
 
 ```mermaid
 flowchart LR
-    U[Observed / Documented behavior] --> Q[Verification Queue]
-    Q --> T[Runtime test]
-    T -->|Confirmed| E[Canonical evidence + node documentation]
-    T -->|Not confirmed| Q
-    T -->|Contradicted| C[Update canonical docs + evidence]
+    O[Observed / Documented] --> Q[Open question]
+    Q --> T[Controlled test]
+    T -->|Confirmed| C[Update canonical evidence]
+    T -->|Still unknown| Q
+    T -->|Contradicted| C
 ```
 
-## Required handling when an item is verified
+## 1. Output and variables
 
-1. Run and record the test.
-2. Update the relevant evidence record with the observed runtime result.
-3. Update the canonical node documentation if the verified result changes or strengthens the documented behavior.
-4. Remove the item from this file.
-5. Add a reference to the evidence record where useful.
+### OUT-001: Complete Output expression coverage
 
-Do **not** keep verified items in this queue as historical clutter. Git history already preserves the trail.
+**Known:** `{{flow.startTestResponse}}` and `{{system.humanInput}}` are runtime-confirmed Output response sources.
 
----
+**Open:** Complete supported expression paths and source types.
 
-# Active verification items
+### VAR-001: Complete Flow Variable lifecycle
 
-## Decision Tree
+**Known:** A user-created Flow Variable can be populated by Human Input and consumed by Output in the tested path.
 
-### DT-001: Produces-key behavior and loop prevention
+**Open:** Automatic creation, overwrite behavior, collection/object mutation and behavior across other node producers.
 
-**Current understanding:** A Decision Tree step can produce state keys, and the documented guidance says produces keys gate ordering and help prevent loops.
+### VAR-002: User-created System variables
 
-**Needs verification:** Exactly how the runtime determines that a step is complete, especially when a produced key already exists, changes type, or is cleared later.
+**Open:** Whether custom System-scope variables behave like built-in System variables and what permissions/semantics apply.
 
-**Test:** Build a small tree with one step producing a key. Execute it repeatedly with the key present, absent, and explicitly cleared.
+## 2. Human Input
 
-**Target evidence:** `03-Evidence/Decision-Tree-Node-Evidence.md`
+### HI-001: Output variable `input` serialization
 
-### DT-002: Start connectivity requirement
+**Open:** Exact `input` output-variable shape across free text and other response modes.
 
-**Current understanding:** Every Decision Tree step must ultimately connect back to Start to run, and the editor reports disconnected-node issues.
+### HI-002: State Update ordering
 
-**Needs verification:** Exact runtime behavior for a step that is visually present but not connected to Start.
+**Open:** Ordering between response persistence and Advanced → State Update.
 
-**Test:** Save/run a tree containing an unreachable branch and inspect validation and execution behavior.
+### HI-003: Timeout / abandonment / resume
 
-**Target evidence:** `03-Evidence/Decision-Tree-Node-Evidence.md`
+**Open:** Waiting timeout, abandoned response handling and delayed resume behavior.
 
-### DT-003: Condition operator semantics
+## 3. Approval
 
-**Current understanding:** Conditions expose operators including Equals, Not Equals, Greater Than or Equal To, Less Than or Equal To, Greater Than, Less Than, Contains, Is Empty, and Is Not Empty.
+### AP-001: Decision serialization
 
-**Needs verification:** Type coercion, null handling, array/string behavior, and exact semantics for each operator.
+**Open:** Exact runtime value/casing of `decision` after Approve and Reject.
 
-**Test:** Exercise each operator against strings, numbers, booleans, null, empty strings, empty arrays, and missing keys.
+### AP-002: Custom button labels
 
-**Target evidence:** `03-Evidence/Decision-Tree-Node-Evidence.md`
+**Open:** Whether changing button labels changes only presentation or also the serialized decision value.
 
-### DT-004: Path evaluation order
+### AP-003: State Update ordering
 
-**Current understanding:** Decision paths are checked top-to-bottom and the first matching path wins; an `else` path runs when no named path matches.
+**Open:** Ordering and transactionality of approval state updates relative to branch selection.
 
-**Needs verification:** Whether this ordering remains deterministic when multiple path conditions match and whether condition evaluation is short-circuited.
+### AP-004: Pause / resume / timeout
 
-**Test:** Create overlapping conditions and observe the selected path.
+**Open:** Long-running pending approvals and resume semantics.
 
-**Target evidence:** `03-Evidence/Decision-Tree-Node-Evidence.md`
+### AP-005: Audit metadata
 
-### DT-005: Ask User state capture
+**Open:** Approver identity, timestamps, comments and action history.
 
-**Current understanding:** Ask User can capture typed replies, widget selections, or handoff-to-person responses into state.
+### AP-006: Unconnected branch behavior
 
-**Needs verification:** Exact persisted state shape and serialization for typed replies, widget values, and human handoff results.
+**Open:** Runtime behavior when Approved or Rejected has no downstream edge.
 
-**Test:** Execute each response mode and inspect resulting state.
+## 4. Rule
 
-**Target evidence:** `03-Evidence/Decision-Tree-Node-Evidence.md`
+### RULE-001: Type and null semantics
 
-### DT-006: Decision Tree Tool Call result handling
+**Open:** Null vs missing vs empty string, case sensitivity, numeric/string coercion, dates and collection behavior for `Contains`.
 
-**Current understanding:** A Decision Tree tool step can call a backend tool, map inputs from state, and save part of the tool result under a chosen name.
+### RULE-002: Complex Boolean grouping
 
-**Needs verification:** Exact result-path syntax, behavior on missing result fields, tool errors, and whether saved values overwrite existing state.
+**Open:** Nested AND/OR groups and precedence.
 
-**Test:** Return nested objects, missing fields, null values, and errors from a test tool.
+### RULE-003: Missing-field behavior
 
-**Target evidence:** `03-Evidence/Decision-Tree-Node-Evidence.md`
+**Open:** Runtime outcome when a referenced field does not exist.
 
-### DT-007: Compute state semantics
+## 5. Decision Tree
 
-**Current understanding:** Compute can derive/update state without user interaction and can clear values from memory.
+### DT-001: Produces-key completion/loop semantics
 
-**Needs verification:** Exact expression capabilities, evaluation environment, mutation ordering, and behavior when a clear targets a missing key.
+**Open:** Exact completion gating when produced keys exist, change or are cleared.
 
-**Test:** Exercise multiple writes and clears in one Compute step and inspect final state.
+### DT-002: Internal condition semantics
 
-**Target evidence:** `03-Evidence/Decision-Tree-Node-Evidence.md`
+**Open:** Type coercion, missing-key handling and path evaluation edge cases.
 
-### DT-008: Finish behavior
+### DT-003: Ask User result persistence
 
-**Current understanding:** Finish ends the Decision Tree flow and can show a final message.
+**Open:** Exact state shape for typed replies, widget selections and person-handled responses.
 
-**Needs verification:** Whether the final message supports variable interpolation, whether state is committed before termination, and whether downstream orchestration receives a structured result.
+### DT-004: Tool Call result/error behavior
 
-**Test:** Finish with interpolated state and inspect execution output.
+**Open:** Result paths, missing fields, retries/timeouts and error routing.
 
-**Target evidence:** `03-Evidence/Decision-Tree-Node-Evidence.md`
+### DT-005: Compute and Done semantics
 
----
+**Open:** State mutation/clearing order, final-message interpolation and downstream result propagation.
 
-## Approval
+## 6. Script
 
-### AP-001: Decision output serialization
+### SCRIPT-001: Runtime and execution limits
 
-**Current understanding:** The Approval node exposes `decision : string`, described as `approve` or `reject`.
+**Open:** JavaScript engine/version, globals/modules, async/Promise support, timeout and resource limits.
 
-**Needs verification:** Exact runtime value casing and serialization.
+### SCRIPT-002: Schema enforcement
 
-**Test:** Run both branches and inspect the output variable.
+**Open:** Behavior for missing, extra or wrong-type inputs/outputs.
 
-**Target evidence:** `03-Evidence/Approval-Node-Evidence.md`
+### SCRIPT-003: State Update and downstream result semantics
 
-### AP-002: Custom button labels vs decision value
+**Open:** Atomicity, ordering and exact downstream resolution.
 
-**Current understanding:** Approve/Reject labels are configurable.
+## 7. Agent
 
-**Needs verification:** Whether changing the visible labels changes the serialized `decision` value or only presentation.
+### AG-001: Context Management
 
-**Test:** Use labels such as `Award Supplier` / `Send Back` and inspect `decision`.
+**Open:** Exact threshold accounting, replacement/drop ordering and resulting message context.
 
-**Target evidence:** `03-Evidence/Approval-Node-Evidence.md`
+### AG-002: Long-term Memory
 
-### AP-003: Approval state-update timing
+**Open:** Persistence and retrieval timing across sessions.
 
-**Current understanding:** Approval exposes State Update.
+### AG-003: Include Thoughts
 
-**Needs verification:** Exact ordering between state mutation and route selection, including behavior on rejection.
+**Open:** Exact runtime representation and downstream exposure.
 
-**Test:** Write decision-related state and inspect it on both branches.
+### AG-004: Error Handling
 
-**Target evidence:** `03-Evidence/Approval-Node-Evidence.md`
+**Open:** Retry, fallback and failure-state semantics.
 
-### AP-004: Pending approval timeout and resume
+### AG-005: Deep Agent
 
-**Current understanding:** Approval pauses orchestration for a human decision.
+**Open:** Scheduling, aggregation and partial-failure behavior with 0–3 subagents.
 
-**Needs verification:** Timeout behavior, resume behavior after long pauses, and pending-state persistence.
+### AG-006: Agent State Update and scope precedence
 
-**Test:** Leave an approval pending beyond the expected operational window and resume it later.
+**Open:** Append/Extend/Set/Clear behavior on representative state types and same-name scope collisions.
 
-**Target evidence:** `03-Evidence/Approval-Node-Evidence.md`
+## 8. Agent tools and artifacts
 
-### AP-005: Approval identity and audit metadata
+### TOOL-001: Export tools end-to-end
 
-**Current understanding:** The visible UI establishes the decision but does not establish the full metadata emitted by the runtime.
+**Open:** Execute each export tool, inspect generated artifact, exact result structure, `system.files` update and downstream attachment delivery.
 
-**Needs verification:** Approver identity, timestamp, comments, action history, and audit metadata.
+Affected tools:
+- Export Excel V2
+- Export PowerPoint V2
+- Export PDF V2
+- Export Word V2
+- Export HTML V2
 
-**Test:** Approve/reject and inspect execution metadata/output objects.
+Detailed verification remains in the corresponding tool-specific files.
 
-**Target evidence:** `03-Evidence/Approval-Node-Evidence.md`
+### TOOL-002: Extract Document to Markdown
 
-### AP-006: Unconnected approval handle behavior
+**Open:** Runtime extraction fidelity, OCR/vision quality, BlobProxy output, malformed-file behavior and exact success/error envelope.
 
-**Current understanding:** Approved and Rejected handles are intended to route the workflow.
+### TOOL-003: Conversation Attachment / ExportBlob
 
-**Needs verification:** Exact runtime behavior if one handle is left unconnected.
+**Open:** Retrieval and final attachment behavior, including multiple files.
 
-**Test:** Run with one branch intentionally disconnected.
+### TOOL-004: Web Search
 
-**Target evidence:** `03-Evidence/Approval-Node-Evidence.md`
+**Open:** Runtime result shape and citation propagation requirements in downstream/final responses.
 
----
+### TOOL-005: Store / Retrieve
 
-## Human Input
+**Open:** Persistence scope and lifecycle of the memory bag.
 
-### HI-001: Response serialization
+### TOOL-006: Send Email
 
-**Current understanding:** Human Input asks a person a question and stores the response. The UI exposes output variable `input` with type `object` and description `The user's input response`.
+**Open:** Recipient validation, attachment behavior, exact result/error shape and downstream state.
 
-**Needs verification:** Exact runtime shape and serialization of `input`, including whether free-text input is represented as an object with a text/value field or another structure.
+### TOOL-007: System tool discovery layer
 
-**Test:** Submit controlled free-text responses of different lengths and inspect the downstream output/state.
+**Open:** Runtime behavior of SearchSystemTools → GetSystemToolSchema → ExecuteSystemTool, including failure/invalid-schema cases.
 
-**Target evidence:** `03-Evidence/Human-Input-Node-Evidence.md`
+### TOOL-008: Knowledge workflow prerequisite
 
-### HI-002: Save Response As variable resolution
+**Open:** Runtime enforcement and ordering of `get-knowledge-workflow-instructions` before knowledge-source tools.
 
-**Current understanding:** The UI lets the designer select a variable target and displays `variableTarget` as the flow variable path where input was stored. The example target is `system / humanInput`.
+## 9. Additional nodes
 
-**Needs verification:** Exact path resolution, whether missing variables are created automatically, and behavior when a target already exists.
+LLM, External Agent, Compute, Subflow, Handoff, Guardrail and Output have capability-level observations but incomplete dedicated configuration/runtime evidence. Do not infer their detailed contracts until dedicated captures and tests are performed.
 
-**Test:** Use new, existing, nested, and differently scoped targets and inspect resulting state.
+## Promotion rule
 
-**Target evidence:** `03-Evidence/Human-Input-Node-Evidence.md`
+For every confirmed item:
 
-### HI-003: State Update ordering
-
-**Current understanding:** Human Input exposes Advanced > State Update in addition to saving the response.
-
-**Needs verification:** Whether state updates execute before or after response persistence, and what value later steps observe when both touch related keys.
-
-**Test:** Configure a State Update that writes a related key, capture Human Input, and inspect final state and downstream reads.
-
-**Target evidence:** `03-Evidence/Human-Input-Node-Evidence.md`
-
-### HI-004: Timeout, abandonment, and resume
-
-**Current understanding:** Human Input pauses the orchestration while waiting for a person to respond.
-
-**Needs verification:** Timeout behavior, abandonment handling, resume behavior, and state persistence across a delayed response.
-
-**Test:** Leave the node waiting, resume after a controlled delay, and test abandoned/no-response scenarios.
-
-**Target evidence:** `03-Evidence/Human-Input-Node-Evidence.md`
-
-### HI-005: Downstream availability
-
-**Current understanding:** The guidance says later steps can read the stored response and that an Agent/LLM or Rule can use it.
-
-**Needs verification:** Exact downstream reference syntax, when the value becomes available, and how it behaves across Agent, Rule, and other nodes.
-
-**Test:** Consume the Human Input result from multiple downstream node types and inspect the exact resolved values.
-
-**Target evidence:** `03-Evidence/Human-Input-Node-Evidence.md`
-
-### HI-006: Input/output relation
-
-**Current understanding:** The UI exposes both `input` and `variableTarget` as output variables.
-
-**Needs verification:** Whether `variableTarget` contains the literal configured path, a normalized path, or runtime metadata, and whether `input` always corresponds exactly to what was written to that target.
-
-**Test:** Compare the output object with the resolved target value across several target paths.
-
-**Target evidence:** `03-Evidence/Human-Input-Node-Evidence.md`
-
----
-
-## Script
-
-### SC-001: JavaScript runtime version and globals
-
-**Current understanding:** Script executes JavaScript.
-
-**Needs verification:** Runtime/engine version and available standard globals/modules.
-
-**Test:** Run controlled feature-detection scripts and document supported capabilities.
-
-**Target evidence:** `03-Evidence/Script-Node-Evidence.md`
-
-### SC-002: Async/Promise support
-
-**Current understanding:** The screenshots establish JavaScript execution but not asynchronous semantics.
-
-**Needs verification:** Whether async functions and Promises are supported and awaited.
-
-**Test:** Return resolved/rejected Promises and inspect behavior.
-
-**Target evidence:** `03-Evidence/Script-Node-Evidence.md`
-
-### SC-003: Execution timeout and resource limits
-
-**Current understanding:** The node has an execution boundary.
-
-**Needs verification:** Maximum execution time, memory limits, and practical payload limits.
-
-**Test:** Controlled long-running and large-object experiments.
-
-**Target evidence:** `03-Evidence/Script-Node-Evidence.md`
-
-### SC-004: Output-schema enforcement
-
-**Current understanding:** The node exposes a Return (Output) schema and the script returns an object.
-
-**Needs verification:** Whether mismatched types/fields are rejected, coerced, dropped, or accepted.
-
-**Test:** Deliberately return missing fields, extra fields, and wrong types.
-
-**Target evidence:** `03-Evidence/Script-Node-Evidence.md`
-
-### SC-005: State-update behavior
-
-**Current understanding:** Script supports State Update under Advanced.
-
-**Needs verification:** Atomicity, ordering, overwrite behavior, and interaction with the returned result.
-
-**Test:** Perform multiple state mutations and inspect state and result independently.
-
-**Target evidence:** `03-Evidence/Script-Node-Evidence.md`
-
-### SC-006: Downstream result resolution
-
-**Current understanding:** Guidance describes `nodes.<nodeName>.result.<field>` for downstream access.
-
-**Needs verification:** Exact expression resolution, nested objects, arrays, missing fields, and node naming edge cases.
-
-**Test:** Consume primitive, nested, and array outputs from downstream nodes.
-
-**Target evidence:** `03-Evidence/Script-Node-Evidence.md`
-
-### SC-007: Console-log visibility
-
-**Current understanding:** `console.log(...)` is shown in the documented example.
-
-**Needs verification:** Where logs are surfaced and whether production execution retains them.
-
-**Test:** Run a simple log statement and inspect execution diagnostics.
-
-**Target evidence:** `03-Evidence/Script-Node-Evidence.md`
-
----
-
-## Agent
-
-### AG-001: Context Management semantics
-
-**Current understanding:** Context Management exposes Tool results only / Full history and Replace / Drop strategies with token/turn thresholds.
-
-**Needs verification:** Exact message construction, truncation/drop ordering, token accounting, and threshold boundary behavior.
-
-**Test:** Run identical agents with controlled context growth and inspect execution payloads/results.
-
-**Target evidence:** `14-Evidence/2026-08-23-Agent-Node.md`
-
-### AG-002: Long-term Memory persistence and retrieval timing
-
-**Current understanding:** Long-term Memory is described as persisting useful facts across sessions.
-
-**Needs verification:** Persistence timing, retrieval timing, scope, and overwrite behavior.
-
-**Test:** Store a controlled fact in one session and query from a new session.
-
-**Target evidence:** `14-Evidence/2026-08-23-Agent-Node.md`
-
-### AG-003: State Update semantics
-
-**Current understanding:** Agent exposes Append, Extend, Set, and Clear state updates.
-
-**Needs verification:** Exact behavior for arrays, objects, scalars, missing keys, and conflicting updates.
-
-**Test:** Exercise each operation against representative state types.
-
-**Target evidence:** `14-Evidence/2026-08-23-Agent-Node.md`
-
-### AG-004: Include Thoughts output behavior
-
-**Current understanding:** Include Thoughts is exposed in Advanced settings.
-
-**Needs verification:** Exact runtime representation, accessibility, downstream exposure, and whether the content is retained in execution outputs.
-
-**Test:** Enable it in a controlled non-sensitive workflow and inspect outputs.
-
-**Target evidence:** `14-Evidence/2026-08-23-Agent-Node.md`
-
-### AG-005: Deep Agent subagent scheduling
-
-**Current understanding:** Deep Agent supports subagents, with a displayed maximum of three parallel subagents and a parallel execution toggle.
-
-**Needs verification:** Scheduling, ordering, aggregation, failure isolation, and behavior at 0/1/2/3 subagents.
-
-**Test:** Run controlled subagent workloads and inspect execution traces.
-
-**Target evidence:** `14-Evidence/2026-08-23-Agent-Node.md`
-
-### AG-006: Error handling and retry semantics
-
-**Current understanding:** Error Handling is exposed in Advanced settings.
-
-**Needs verification:** Exact retry/fallback behavior and interaction with agent state/output.
-
-**Test:** Trigger controlled tool and agent failures and inspect handling.
-
-**Target evidence:** `14-Evidence/2026-08-23-Agent-Node.md`
-
-### AG-007: Variable scope precedence
-
-**Current understanding:** Variable Browser exposes multiple scopes including Current Node, workflow/referenced contexts, Environment, Authorization, Metadata, Flow, and System.
-
-**Needs verification:** Precedence and collision behavior when same-named fields exist in multiple scopes.
-
-**Test:** Create controlled collisions and resolve variables from the browser/runtime.
-
-**Target evidence:** `14-Evidence/2026-08-23-Agent-Node.md`
-
-### AG-008: Get Reference File runtime output and missing-item behavior
-
-**Current understanding:** `get_reference_file` returns textual content for a knowledge item and an empty string when the item does not exist or has no content. Exact IDs must come from metadata and repeated calls for the same knowledge item should be avoided.
-
-**Needs verification:** Exact runtime output shape, error behavior, content limits/truncation, and distinction between nonexistent and empty-content items.
-
-**Test:** Run existing, nonexistent, empty, and very large knowledge items and inspect outputs/errors.
-
-**Target evidence:** `14-Evidence/2026-08-23-Agent-Node.md`
-
-### AG-009: Get Table Schema runtime schema contract
-
-**Current understanding:** `get_table_schema` returns a JSON array of field objects with `columnName`, `dataType`, `description`, and `isVectorized`, and is intended to precede filtering/search.
-
-**Needs verification:** Exact JSON schema, type mappings, missing fields, ordering, caching, and behavior for unavailable/empty knowledge sources.
-
-**Test:** Capture schemas from several knowledge sources and compare exact result objects.
-
-**Target evidence:** `14-Evidence/2026-08-23-Agent-Node.md`
-
-### AG-010: Resolve Field Value ranking and no-match behavior
-
-**Current understanding:** `resolve_field_value` semantically or synonymously resolves user-mentioned values to closer actual values and supports a search hint and maximum-values-per-field setting.
-
-**Needs verification:** Ranking/scoring, confidence threshold, tie handling, no-match response, and exact output shape.
-
-**Test:** Use exact, synonym, ambiguous, misspelled, and nonexistent values across controlled fields.
-
-**Target evidence:** `14-Evidence/2026-08-23-Agent-Node.md`
-
-### AG-011: Search Table Data query and aggregation semantics
-
-**Current understanding:** `search_table_data` supports filters, AND/OR, aggregations, semantic/keyword/hybrid search, discovered/resolved values, pagination, and response field selection.
-
-**Needs verification:** Exact query grammar, filter precedence, aggregation result shape, pagination consistency, semantic/hybrid behavior, and size limits.
-
-**Test:** Execute controlled filter, grouping, aggregation, semantic, keyword, hybrid, and paginated queries and capture exact results.
-
-**Target evidence:** `14-Evidence/2026-08-23-Agent-Node.md`
-
-### AG-012: Recall Memory retrieval semantics
-
-**Current understanding:** `recall_memory` semantically searches saved long-term memories, returns closest matches with memory identifiers/content/relevance, and should be called before saving to avoid duplicates. Identity/tenant keys are not passed because scope is automatic.
-
-**Needs verification:** Relevance ranking, scope resolution, retrieval timing, duplicate behavior, empty-result behavior, and exact result schema.
-
-**Test:** Seed controlled memories with exact, related, duplicate, and conflicting facts across sessions and inspect recall results.
-
-**Target evidence:** `14-Evidence/2026-08-23-Agent-Node.md`
-
----
-
-## Additional observed nodes
-
-### AO-001: Node configuration completeness
-
-**Current understanding:** Additional observed nodes have been identified from the screenshots and grouped in `Additional-Observed-Nodes.md`.
-
-**Needs verification:** Dedicated configuration controls, input/output contracts, runtime semantics, failure behavior, and routing details for each additional node.
-
-**Test:** Capture one representative configuration screenshot and one runtime test per node before promoting claims to canonical evidence.
-
-**Target evidence:** `03-Evidence/2026-08-23-Additional-Node-Evidence.md`
-
-### AO-002: External Agent execution semantics
-
-**Current understanding:** External Agent has been observed as a distinct capability.
-
-**Needs verification:** Invocation contract, response mapping, authentication boundary, timeout behavior, and error handling.
-
-**Test:** Execute a controlled External Agent call with success and failure cases.
-
-**Target evidence:** `03-Evidence/2026-08-23-Additional-Node-Evidence.md`
-
-### AO-003: Subflow semantics
-
-**Current understanding:** Subflow has been observed as a distinct workflow capability.
-
-**Needs verification:** Input/output mapping, state inheritance, error propagation, return behavior, and nesting limits.
-
-**Test:** Execute parent/child flows with primitive and structured inputs/outputs.
-
-**Target evidence:** `03-Evidence/2026-08-23-Additional-Node-Evidence.md`
-
-### AO-004: Handoff / Human Input semantics
-
-**Current understanding:** Human interaction and handoff capabilities have been observed.
-
-**Needs verification:** Ownership transfer semantics, response routing, timeout/resume behavior, and state serialization.
-
-**Test:** Run a controlled handoff and human-input cycle through completion and abandonment cases.
-
-**Target evidence:** `03-Evidence/2026-08-23-Additional-Node-Evidence.md`
-
-### AO-005: Guardrail execution behavior
-
-**Current understanding:** Guardrail has been observed as a capability.
-
-**Needs verification:** When the guardrail runs, what it can block, what output it produces, and how failures route.
-
-**Test:** Create controlled allowed/disallowed inputs and inspect execution behavior.
-
-**Target evidence:** `03-Evidence/2026-08-23-Additional-Node-Evidence.md`
-
-### AO-006: Compute semantics
-
-**Current understanding:** Compute has been observed as a node type and is described as deriving/updating values without user interaction.
-
-**Needs verification:** Supported expression language, data types, null behavior, and error semantics.
-
-**Test:** Exercise arithmetic, string, object, array, null, and invalid-expression cases.
-
-**Target evidence:** `03-Evidence/2026-08-23-Additional-Node-Evidence.md`
-
-### AO-007: Output node semantics
-
-**Current understanding:** Output is represented in the observed node set.
-
-**Needs verification:** Exact output contract, variable exposure, formatting, and downstream behavior.
-
-**Test:** Emit primitive and structured values and inspect final execution outputs.
-
-**Target evidence:** `03-Evidence/2026-08-23-Additional-Node-Evidence.md`
-
----
-
-# Promotion rule
-
-An item is removed from this file only when there is enough evidence to state the behavior confidently.
-
-Use this sequence:
-
-```text
-Open question
-    ↓
-Test designed
-    ↓
-Runtime result captured
-    ↓
-Evidence record updated
-    ↓
-Canonical node documentation updated
-    ↓
-Item removed from this queue
-```
-
-When a test **contradicts** the current understanding, do not simply delete the item. First update the relevant evidence and canonical documentation to reflect the corrected behavior, then remove the resolved question from the queue.
-
-# What does NOT belong here
-
-Do not put the following in this file:
-
-- generic product ideas with no evidence
-- personal notes unrelated to QI Studio behavior
-- already verified facts that have been moved into evidence records
-- secrets, credentials, authorization values, runtime tokens, or sensitive payloads
+1. Record the test inputs and runtime result in the relevant evidence file.
+2. Update the canonical node/tool documentation.
+3. Remove the item from this queue.
+4. Keep failed or historical tests in evidence/history so later investigators can understand why the current design exists.
