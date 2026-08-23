@@ -68,6 +68,24 @@
 - **TOOL-007:** SearchSystemTools → GetSystemToolSchema → ExecuteSystemTool runtime and failure behavior.
 - **TOOL-008:** Knowledge workflow prerequisite enforcement for `get-knowledge-workflow-instructions`.
 
+## Bid Analysis Agent
+
+- **BA-001:** Same Master Deep Agent node can be re-entered after canonical mapping and correctly switch behavior using `flow.currentStage`.
+- **BA-002:** Handoff tool parameter serialization preserves typed objects/arrays and reaches the target node exactly as configured.
+- **BA-003:** Handoff return context with `Pass context = ON` + `Last message (append)` preserves the specialist structured result without replacing Master context.
+- **BA-004:** Master structured JSON output can expose a nested `evaluationQC` object and map it into `flow.evaluationQC` using the expression system.
+- **BA-005:** Configuration Validation can consume `flow.clarificationPackage` + `system.humanInput` and persist an object into `flow.evaluationConfiguration` with nested field mapping.
+- **BA-006:** Questionnaire Validation output object and Canonical Mapping output object satisfy Script input/output schemas without hidden type coercion.
+- **BA-007:** Script State Update from `{{nodes.<nodeName>.result}}` and nested references persists the expected object rather than a string representation.
+- **BA-008:** Deterministic chain preserves single-producer state ownership across Knockout → Score Validation → Weighted Score → Ranking → Result Builder.
+- **BA-009:** Execution & Reporting Agent can invoke the `bid-analysis-report-generator` Skill after `flow.evaluationResult` becomes available.
+- **BA-010:** Skill can access required Flow Variables and invoke its bundled `Export Excel V2` tool.
+- **BA-011:** Export Excel V2 produces the four-sheet report with dynamic supplier scaling and the intended formatting contract.
+- **BA-012:** Export result can be stored in `flow.report` without contaminating `system.files` input state.
+- **BA-013:** Output can expose the generated report artifact/reference through custom output variables and user-visible response mapping.
+- **BA-014:** Human Input `CORRECT` / `REJECT` paths can safely pause, loop or terminate without accidentally creating an approved evaluation configuration.
+- **BA-015:** Knowledge-tool prerequisite and library context behave correctly when the Bid Analysis Agent uses the Bid Analyzer library.
+
 ## Additional node families
 
 LLM, External Agent, Compute, Subflow, Handoff, Guardrail and Output have capability-level observations but incomplete dedicated configuration/runtime evidence. Do not infer detailed contracts until dedicated captures/tests exist.
