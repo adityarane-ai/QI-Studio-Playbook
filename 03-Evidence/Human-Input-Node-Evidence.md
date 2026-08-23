@@ -1,74 +1,94 @@
 # Human Input Node Evidence
 
-## Evidence status
+**Evidence ID:** QI-OBS-2026-08-23-HUMAN-INPUT-001  
+**Evidence date:** 2026-08-23  
+**Status:** Runtime Confirmed for the tested free-text response path.  
+**Sources:** User-supplied QI Studio screenshots, supplied product guidance, and controlled runtime tests.
 
-**Observed + Documented. Not yet runtime verified.**
+## UI evidence
 
-## Source 1: UI screenshot supplied in conversation
+The Human Input node exposes:
 
-The supplied Human Input configuration screenshot shows:
+- **Question**: user-facing prompt.
+- **Save Response As**: variable target selector.
+- **Advanced → State Update**: optional state mutation.
+- **Output Variables** including `input` and `variableTarget`.
 
-- Node title: **HUMAN INPUT 0**
-- A **Question** field containing `Please provide your input.`
-- A **Save Response As** variable selector, shown with `system / humanInput`
-- An **Advanced** section
-- **State Update** with `Manage state updates` and `+ Add State`
-- **Output Variables (2)**
-- Output variable `input`, type `object`, described as `The user's input response`
-- Output variable `variableTarget`, type `string`, described as `The flow variable path where input was stored`
+The supplied UI example uses `system / humanInput` as a response target.
 
-## Source 2: Supplied QI Studio / Confluence guidance
+## Runtime Test A: Flow Variable
 
-The supplied product guidance states that the Human Input node:
+Configuration:
 
-> pauses your orchestration to ask a person a question, then saves their answer so the rest of the flow can use it.
+```text
+Human Input → flow.startTestResponse
+Output → {{flow.startTestResponse}}
+```
 
-It further distinguishes Human Input from Approval:
+Observed result:
 
-- Human Input is intended to collect an answer and carry on.
-- Approval is intended for a yes/no decision that branches to Approved vs Rejected paths.
+```text
+nodes.human_input_0.input = "START_TEST"
+nodes.human_input_0.variableTarget = "flow.startTestResponse"
+flow.startTestResponse = "START_TEST"
+nodes.output_0.output.messages = "START_TEST"
+status = completed
+```
 
-The guidance also states that the person is shown the configured Question, the response is saved through Save Response As, and later steps can read the stored response. It notes that an Agent or LLM can use the answer, or a Rule node can branch on it.
+**PASS: Runtime Confirmed.**
 
-## Configuration evidence
+## Runtime Test B: System `humanInput`
 
-### Question
+Configuration:
 
-The screenshot establishes a configurable user-facing prompt.
+```text
+Human Input → system.humanInput
+Output → {{system.humanInput}}
+```
 
-### Save Response As
+Observed result:
 
-The screenshot establishes a variable target selector. The example shown is `system / humanInput`.
+```text
+nodes.human_input_0.input = "START_TEST"
+nodes.human_input_0.variableTarget = "system.humanInput"
+system.humanInput = "START_TEST"
+nodes.output_0.output.messages = "START_TEST"
+User Window = "START_TEST"
+status = completed
+```
 
-### Advanced > State Update
+**PASS: Runtime Confirmed.**
 
-The screenshot establishes an optional state-update area. No state update is configured in the captured example.
+## Established behavior
 
-### Output Variables
+The tested Human Input node:
 
-The screenshot establishes these outputs:
+1. pauses for a free-text response;
+2. exposes the captured response in node runtime data;
+3. writes the response to the configured tested target variable;
+4. allows downstream Output to consume that target through an explicit variable reference.
 
-| Name | Type | Description shown in UI |
-|---|---|---|
-| `input` | object | The user's input response |
-| `variableTarget` | string | The flow variable path where input was stored |
+## Historical regression
 
-## Evidence boundaries
+An earlier flow completed upstream but the User Window showed:
 
-The screenshot and supplied documentation do **not** by themselves prove:
+```text
+No response content found in the execution result. Please try again.
+```
 
-- exact serialization of `input`
-- exact runtime variable path resolution
-- creation/overwrite semantics for the target variable
-- timing between response persistence and State Update execution
-- timeout or abandonment behavior
-- resume behavior after a pause
-- exact downstream state visibility
+The later controlled tests establish that the important distinction is the **Output response contract**. Upstream Human Input success does not itself guarantee a user-visible final response.
 
-These remain verification items rather than established runtime facts.
+## Evidence boundary
 
-## Verification status
+Still not runtime-proven:
 
-No independent runtime test has been recorded for this node yet.
+- exact serialization of output variable `input` for all response types;
+- target-variable automatic creation/overwrite semantics outside the tested paths;
+- Human Input State Update ordering;
+- timeout, abandonment and resume behavior;
+- widget or other response modes;
+- full Output expression-language coverage.
 
-See [Human Input Node](../02-Orchestration-Primitives/Human-Input.md) and [Verification Queue](../04-Verification/Verification-Queue.md).
+## Verification rule
+
+Keep the failed regression as historical evidence. Do not treat it as proof that Human Input fails; it proves that a workflow can finish upstream without a usable Output response source.
