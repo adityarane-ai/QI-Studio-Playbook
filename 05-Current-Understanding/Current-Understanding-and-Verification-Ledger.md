@@ -1,105 +1,83 @@
 # Current Understanding & Verification Ledger
 
-**Status:** Canonical working ledger  
+**Status:** Canonical truth boundary  
 **Last updated:** 23 Aug 2026  
-**Scope:** Current QI Studio platform understanding established through supplied UI/documentation evidence and runtime tests.
+**Scope:** QI Studio behavior established from supplied UI/configuration evidence and runtime tests.
 
-This ledger is the authoritative place for facts that are currently believed to be true but may still require verification. It prevents working assumptions from being mixed with established evidence.
+This ledger is the compact source of truth for what is established, what is only observed/documented, and what still requires verification.
 
-## Evidence status model
+## Evidence model
 
 | Status | Meaning |
 |---|---|
-| Confirmed | Directly shown in QI Studio UI or explicit platform/product documentation. |
-| Runtime Confirmed | Demonstrated through an actual execution and downstream/user-visible result. |
-| Working Understanding | Strong interpretation based on evidence, but not fully proven. |
-| Pending Verification | Capability/question identified but not sufficiently tested. |
-| Contradicted | An earlier assumption was disproven by stronger evidence. |
-| Superseded | An earlier formulation remains historically useful but has been replaced by newer evidence. |
+| **Observed** | Visible in supplied UI/screenshots. |
+| **Documented** | Explicitly stated in supplied QI Studio/product guidance. |
+| **Runtime Confirmed** | Reproduced in execution and consumed downstream or shown to the user. |
+| **Open** | Identified but not yet sufficiently tested. |
 
-## Current verified understanding
+A capability can be Observed + Documented without being Runtime Confirmed.
+
+## Runtime-confirmed understanding
 
 ### Variables and state
 
-- QI Studio exposes logical variable areas including **Flow**, **System**, **Conversation History**, **Runtime**, and an aggregate view.
-- Flow Variables are workflow-owned state and are created through the Variables UI.
-- Built-in System variables are platform-managed. The tested `system.humanInput` variable is populated by Human Input.
-- Conversation History is conversational context and should not be used as a substitute for explicit workflow state.
-- Runtime variables describe execution context and should not be treated as business state.
+- QI Studio exposes Flow, System, Conversation History, Runtime and aggregate variable views.
+- Flow Variables are user-created workflow state configured through the Variables UI.
+- Built-in System variables are platform-managed.
+- `system.humanInput` is populated by Human Input in the tested path.
+- Conversation History is contextual conversation data, not a substitute for explicit workflow state.
+- Runtime values describe execution context and should not be treated as business state.
 
-### Human Input
+### Start → Human Input → Output
 
-- Human Input pauses the orchestration, asks a person a free-text question, captures the response, and stores it in a configured variable target.
-- Runtime-confirmed path using Flow state:
-
-```text
-Human Input → flow.startTestResponse → explicit Output reference → User Window
-```
-
-- Runtime-confirmed path using System state:
+Two controlled tests passed:
 
 ```text
-Human Input → system.humanInput → explicit Output reference → User Window
+Human Input → flow.startTestResponse → Output {{flow.startTestResponse}}
+Human Input → system.humanInput       → Output {{system.humanInput}}
 ```
 
-- The exact response can be observed in node runtime state as `nodes.human_input_0.input` and in the targeted variable.
-- See [`14-Evidence/2026-08-23-Start-HumanInput-Output-End-to-End-Tests.md`](../14-Evidence/2026-08-23-Start-HumanInput-Output-End-to-End-Tests.md).
+Both produced `START_TEST` downstream. The System-target test also displayed `START_TEST` in the User Window.
+
+Canonical detailed record: `03-Evidence/Start-HumanInput-Output-E2E.md`.
 
 ### Output
 
-- The Output node does **not** infer the intended response merely because another node succeeded or because a value exists somewhere in execution state.
-- An explicit response source must be configured.
-- Runtime-confirmed examples:
+An explicit response source must be configured. The Output node does not automatically infer a final response merely because an upstream node succeeded or because a value exists somewhere in runtime state.
 
-```text
-{{flow.startTestResponse}}
-{{system.humanInput}}
-```
-
-- `{{system.humanInput}}` resolved to `START_TEST`, producing `output.messages = START_TEST` and displaying `START_TEST` to the user.
-- The complete set of expression types accepted by Output is still not fully mapped.
-
-### Flow Variable path
-
-A Human Input response can target a user-created Flow Variable and the value can be consumed by Output through an explicit variable reference. This is now **Runtime Confirmed**, not merely pending.
-
-What remains unverified is the complete Flow Variable feature set, including all operations and whether all variable-producing nodes behave identically.
-
-### Start node
-
-The START node successfully accepted incoming user messages in the tested flow and exposed the request through runtime state. Its runtime record included the input message, session ID, stream mode, timestamp, node identity, and success status.
-
-**Runtime Confirmed:** Start execution initializes the tested flow path.
-
-**Important boundary:** Start execution success alone does not imply final-response success.
-
-## Current known regression case
-
-An earlier Start + Human Input run completed but the User Window returned:
+A historical run without a usable Output source produced:
 
 ```text
 No response content found in the execution result. Please try again.
 ```
 
-The controlled tests established that the key issue was the lack of a usable explicit Output response source. The regression is therefore retained as historical evidence that upstream success is not sufficient for user-visible completion.
+That regression establishes an important contract: **upstream execution success is not the same thing as user-visible completion.**
 
-## Agent node understanding
+### Start
 
-The Agent node is a configurable semantic execution boundary combining a model, strategy, instructions/messages, tools/capabilities, context controls, memory, state updates, and output variables.
+Start execution is runtime-confirmed for the tested invocation path. The runtime record contained the invocation message, session ID, stream mode, timestamp, node identity and success status.
 
-Observed Agent strategy options include `ReAct` and `Deep Agent`. Deep Agent exposes subagent controls, including a visible maximum of 3 parallel subagents in the supplied UI evidence.
+This does not establish the complete Start input schema for every invocation mode.
 
-Observed Agent advanced areas include Response Format, Include Thoughts, Guardrails, Context Management, Long-term Memory, Error Handling, State Update, and Output Variables.
+## Current Agent understanding
 
-The Agent output-variable evidence includes at least `text`, `toolCalls`, `structuredOutput`, `success`, and `error` fields.
+The Agent is a configurable semantic execution boundary combining model, strategy, messages, tools/capabilities, context controls, memory, state updates and output variables.
 
-The Agent UI also exposes capability groups including Tools, Libraries, Skills, Widgets, and Connectors.
+Observed strategy options include `ReAct` and `Deep Agent`. Deep Agent showed subagent controls with a displayed maximum of 3 parallel subagents.
 
-See [`02-Orchestration-Primitives/Agent.md`](../02-Orchestration-Primitives/Agent.md) and [`14-Evidence/2026-08-23-Agent-Tool-Catalog.md`](../14-Evidence/2026-08-23-Agent-Tool-Catalog.md).
+Observed advanced areas include Response Format, Include Thoughts, Guardrails, Context Management, Long-term Memory, Error Handling, State Update and Output Variables.
 
-## Tool catalog captured on 23 Aug 2026
+Canonical sources:
 
-The supplied Agent configuration evidence establishes the following named tools/capabilities:
+- `02-Orchestration-Primitives/Agent.md`
+- `03-Evidence/Agent-Node-Evidence.md`
+- `03-Evidence/Agent-Tool-Catalog.md`
+
+## Tool knowledge boundary
+
+The supplied configurations establish tool names, required parameters, option sets, documented outputs and declared artifact wiring. They do not automatically establish successful runtime execution.
+
+The current catalog includes:
 
 - Export Excel V2
 - Export PowerPoint V2
@@ -108,95 +86,51 @@ The supplied Agent configuration evidence establishes the following named tools/
 - Export HTML V2
 - Extract Document to Markdown
 - Brave Web Search
-- Set In Memory
-- Get From Memory
+- Store / Retrieve
 - Send Email
 - Conversation Attachment
-- Export File
-- Search System Tools
-- Get System Tool Schema
-- Execute System Tool
+- ExportBlob
+- SearchSystemTools
+- GetSystemToolSchema
+- ExecuteSystemTool
 - `get-knowledge-workflow-instructions`
 
-The configuration evidence establishes their names, schemas, documented behavior, and declared variable updates. It does **not** by itself prove successful runtime execution of each tool.
+Canonical catalog: `03-Evidence/Agent-Tool-Catalog.md`.
 
-See [`14-Evidence/2026-08-23-Agent-Tool-Catalog.md`](../14-Evidence/2026-08-23-Agent-Tool-Catalog.md).
+## Open verification priorities
 
-## Current pending questions
+1. Output expression coverage beyond the two proven variable references.
+2. Approval decision value, routing and resume semantics.
+3. Agent Context Management, Include Thoughts, Error Handling and long-term-memory runtime behavior.
+4. Agent state-update runtime semantics and variable-scope precedence.
+5. Tool execution and artifact persistence for the export tools.
+6. ExportBlob end-to-end attachment delivery.
+7. Web Search citation propagation.
+8. Store/Retrieve persistence scope.
+9. ConversationAttachment behavior with multiple files.
+10. Knowledge-workflow prerequisite ordering.
+11. Decision Tree, Rule, Script and Variable Update edge-case runtime semantics.
+12. Additional node families such as LLM, External Agent, Compute, Subflow, Handoff, Guardrail and Output where configuration evidence is still incomplete.
 
-1. Prove the complete Flow Variable lifecycle independently of Human Input.
-2. Determine whether custom user-created System-scope variables behave like built-in System variables.
-3. Determine the exact Output response-source resolution rules and supported expression paths.
-4. Determine Agent node output mapping into variables and Output.
-5. Determine Approval decision value, routing, and resume semantics.
-6. Determine Agent-tool result storage, Variable Path, Store Tool Output, Return Direct, Response Filtering, State Update, and tool-level Human-in-the-Loop semantics.
-7. Verify each exported artifact tool through controlled runtime execution, including whether the declared `system.files` append is sufficient for downstream attachment delivery.
-8. Verify `ExportBlob` attachment behavior end to end.
-9. Verify Web Search citation propagation and the exact runtime shape of returned citations.
-10. Verify memory Store/Retrieve persistence scope and lifecycle.
-11. Verify Conversation Attachment behavior for one file and multiple files.
-12. Verify `get-knowledge-workflow-instructions` ordering and its interaction with knowledge-source tools.
-13. Verify Agent Error Handling configuration and recovery semantics.
-14. Verify Agent Include Thoughts runtime behavior and downstream exposure.
-15. Verify Agent Context Management strategies (`Replace`, `Drop`) and threshold semantics.
+## Canonical verification lifecycle
 
-## Canonical testing rule
-
-Use four layers for every capability:
-
-```text
-UI contract
-   ↓
-Runtime contract
-   ↓
-Downstream contract
-   ↓
-User-visible contract
+```mermaid
+flowchart LR
+    E[Evidence] --> C[Canonical documentation]
+    C --> Q[Open verification item]
+    Q --> T[Controlled runtime test]
+    T -->|Confirmed| C
+    T -->|Contradicted| C
+    T -->|Still unknown| Q
 ```
 
-Only the fourth layer, when applicable, can establish full end-to-end behavior.
+When an item is confirmed, remove it from the active queue and preserve the historical test through Git history/evidence records. Do not delete a failed test merely because the workflow was later corrected.
 
-## Tool testing rule
+## Repository structure rule
 
-For system-tool execution through the discovery layer, use:
+- `02-Orchestration-Primitives/` = explanatory canonical node docs.
+- `03-Evidence/` = compact evidence records and runtime tests.
+- `04-Verification/` = active unverified questions only.
+- `05-Current-Understanding/` = current truth boundary.
 
-```text
-SearchSystemTools
-      ↓
-GetSystemToolSchema
-      ↓
-ExecuteSystemTool
-      ↓
-Validate node output / variable mapping
-      ↓
-Validate downstream consumption
-```
-
-For knowledge-source workflows, call `get-knowledge-workflow-instructions` first.
-
-## Lifecycle of this ledger
-
-When a pending item is verified:
-
-```text
-Pending Verification
-      ↓
-Runtime test / direct evidence
-      ↓
-Update canonical documentation + evidence record
-      ↓
-Remove the item from the pending section
-      ↓
-Retain the historical test in the test log
-```
-
-Do not silently delete failed or superseded tests. Historical failures explain why the current design exists.
-
-## Related canonical documents
-
-- `02-Orchestration-Primitives/Start.md`
-- `02-Orchestration-Primitives/Human-Input.md`
-- `02-Orchestration-Primitives/Agent.md`
-- `04-Verification/Verification-Queue.md`
-- `14-Evidence/2026-08-23-Start-HumanInput-Output-End-to-End-Tests.md`
-- `14-Evidence/2026-08-23-Agent-Tool-Catalog.md`
+Do not create parallel evidence trees for the same capability.
