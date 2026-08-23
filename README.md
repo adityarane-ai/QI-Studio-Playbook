@@ -11,20 +11,24 @@ The playbook is designed for two audiences:
 
 ### Orchestration primitives
 
+- [Start Node](./02-Orchestration-Primitives/Start.md)
 - [Agent Node](./02-Orchestration-Primitives/Agent.md)
 - [Approval Node](./02-Orchestration-Primitives/Approval.md)
 - [Decision Tree Node](./02-Orchestration-Primitives/Decision-Tree.md)
 - [Rule Node](./02-Orchestration-Primitives/Rule.md)
 - [Variable Update Node](./02-Orchestration-Primitives/Variable-Update.md)
 - [Script Node](./02-Orchestration-Primitives/Script.md)
+- [Additional Observed Nodes](./02-Orchestration-Primitives/Additional-Observed-Nodes.md)
 
 ### Evidence records
 
 - [Approval Node Evidence](./03-Evidence/Approval-Node-Evidence.md)
 - [Decision Tree Node Evidence](./03-Evidence/Decision-Tree-Node-Evidence.md)
+- [Decision Tree Additional Evidence](./03-Evidence/Decision-Tree-Node-Evidence.md)
 - [Rule Node Evidence](./03-Evidence/Rule-Node-Evidence.md)
 - [Variable Update Node Evidence](./03-Evidence/Variable-Update-Node-Evidence.md)
 - [Script Node Evidence](./03-Evidence/Script-Node-Evidence.md)
+- [Additional Node Evidence](./03-Evidence/2026-08-23-Additional-Node-Evidence.md)
 - [Agent Node Evidence](./14-Evidence/2026-08-23-Agent-Node.md)
 - [Agent Screenshot Evidence Index](./14-Evidence/2026-08-23-Agent-Node-Screenshot-Index.md)
 
@@ -80,6 +84,12 @@ flowchart LR
     O --> Q[Open Question]
     Q --> T
 ```
+
+## Current coverage boundary
+
+The core nodes with dedicated pages are Start, Agent, Approval, Decision Tree, Rule, Variable Update, and Script. Additional capability families identified in the broader QI Studio work are consolidated in [Additional Observed Nodes](./02-Orchestration-Primitives/Additional-Observed-Nodes.md) until dedicated configuration captures are available.
+
+See [Additional Node Evidence](./03-Evidence/2026-08-23-Additional-Node-Evidence.md) for the evidence boundary and remaining work.
 
 ## Core principle
 
