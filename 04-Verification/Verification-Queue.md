@@ -401,6 +401,56 @@ Do **not** keep verified items in this queue as historical clutter. Git history 
 
 **Target evidence:** `14-Evidence/2026-08-23-Agent-Node.md`
 
+### AG-008: Get Reference File runtime output and missing-item behavior
+
+**Current understanding:** `get_reference_file` returns textual content for a knowledge item and an empty string when the item does not exist or has no content. Exact IDs must come from metadata and repeated calls for the same knowledge item should be avoided.
+
+**Needs verification:** Exact runtime output shape, error behavior, content limits/truncation, and distinction between nonexistent and empty-content items.
+
+**Test:** Run existing, nonexistent, empty, and very large knowledge items and inspect outputs/errors.
+
+**Target evidence:** `14-Evidence/2026-08-23-Agent-Node.md`
+
+### AG-009: Get Table Schema runtime schema contract
+
+**Current understanding:** `get_table_schema` returns a JSON array of field objects with `columnName`, `dataType`, `description`, and `isVectorized`, and is intended to precede filtering/search.
+
+**Needs verification:** Exact JSON schema, type mappings, missing fields, ordering, caching, and behavior for unavailable/empty knowledge sources.
+
+**Test:** Capture schemas from several knowledge sources and compare exact result objects.
+
+**Target evidence:** `14-Evidence/2026-08-23-Agent-Node.md`
+
+### AG-010: Resolve Field Value ranking and no-match behavior
+
+**Current understanding:** `resolve_field_value` semantically or synonymously resolves user-mentioned values to closer actual values and supports a search hint and maximum-values-per-field setting.
+
+**Needs verification:** Ranking/scoring, confidence threshold, tie handling, no-match response, and exact output shape.
+
+**Test:** Use exact, synonym, ambiguous, misspelled, and nonexistent values across controlled fields.
+
+**Target evidence:** `14-Evidence/2026-08-23-Agent-Node.md`
+
+### AG-011: Search Table Data query and aggregation semantics
+
+**Current understanding:** `search_table_data` supports filters, AND/OR, aggregations, semantic/keyword/hybrid search, discovered/resolved values, pagination, and response field selection.
+
+**Needs verification:** Exact query grammar, filter precedence, aggregation result shape, pagination consistency, semantic/hybrid behavior, and size limits.
+
+**Test:** Execute controlled filter, grouping, aggregation, semantic, keyword, hybrid, and paginated queries and capture exact results.
+
+**Target evidence:** `14-Evidence/2026-08-23-Agent-Node.md`
+
+### AG-012: Recall Memory retrieval semantics
+
+**Current understanding:** `recall_memory` semantically searches saved long-term memories, returns closest matches with memory identifiers/content/relevance, and should be called before saving to avoid duplicates. Identity/tenant keys are not passed because scope is automatic.
+
+**Needs verification:** Relevance ranking, scope resolution, retrieval timing, duplicate behavior, empty-result behavior, and exact result schema.
+
+**Test:** Seed controlled memories with exact, related, duplicate, and conflicting facts across sessions and inspect recall results.
+
+**Target evidence:** `14-Evidence/2026-08-23-Agent-Node.md`
+
 ---
 
 ## Additional observed nodes
