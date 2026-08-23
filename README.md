@@ -24,7 +24,6 @@ The playbook is designed for two audiences:
 
 - [Approval Node Evidence](./03-Evidence/Approval-Node-Evidence.md)
 - [Decision Tree Node Evidence](./03-Evidence/Decision-Tree-Node-Evidence.md)
-- [Decision Tree Additional Evidence](./03-Evidence/Decision-Tree-Node-Evidence.md)
 - [Rule Node Evidence](./03-Evidence/Rule-Node-Evidence.md)
 - [Variable Update Node Evidence](./03-Evidence/Variable-Update-Node-Evidence.md)
 - [Script Node Evidence](./03-Evidence/Script-Node-Evidence.md)
