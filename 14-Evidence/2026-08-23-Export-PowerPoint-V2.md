@@ -3,15 +3,37 @@
 **Evidence ID:** QI-OBS-2026-08-23-EXPORT-PPT-V2-001  
 **Date:** 2026-08-23  
 **Capability:** Agent export tool for branded PowerPoint presentations.  
-**Source:** User-supplied QI Studio tool configuration text.
+**Source:** User-supplied QI Studio tool configuration JSON and tool description.
 
 ## What was observed
 
 The `Export PowerPoint V2` tool generates a branded PowerPoint `.pptx` presentation from structured content.
 
+### Tool identity and runtime configuration observed
+
+- Tool name: `export_powerpoint_v2`
+- Display title: `Export PowerPoint V2`
+- Tool type: `mcp`
+- Enabled: `true`
+- System/export tool metadata identifies it as an export capability.
+- The configured input schema requires `title` and `slides`.
+- `template` is optional and defaults to `default` in the tool schema.
+- The configured tool is set to `returnDirect: false`.
+- The tool's configured variable update appends `{{nodeOutput}}` to `system.files`.
+
 ### Output filename
 
 The `title` parameter is used as the output filename. The supplied configuration says to use only letters, numbers, spaces, and hyphens.
+
+### Tool schema
+
+Observed top-level input schema:
+
+- `title`: string, required.
+- `slides`: array, required.
+- `template`: string, optional, default `default`.
+
+The supplied schema leaves `slides.items` unconstrained at the JSON-Schema level, with the detailed slide contract defined in the human-readable tool description.
 
 ### Slide structure
 
@@ -156,9 +178,9 @@ The supplied configuration explicitly requires checking supported layouts before
 
 ## Evidence status
 
-**Status:** Configuration contract captured from supplied tool description.
+**Status:** Configuration contract captured from supplied tool description and JSON configuration.
 
-This evidence establishes the listed layouts, content shapes, chart types, template names, filename restrictions, and template-specific support matrix as stated in the supplied configuration.
+This evidence establishes the listed layouts, content shapes, chart types, template names, filename restriction, template-specific support matrix, top-level schema, enabled state, returnDirect setting, and configured `system.files` output-variable update as *configured/documented behavior*. It does not establish that every configured behavior occurs identically at runtime.
 
 ## What this evidence does not prove
 
@@ -173,8 +195,8 @@ The supplied configuration does not establish exact runtime behavior for:
 - bullet length limits and text overflow behavior,
 - unsupported-layout fallback behavior in practice,
 - duplicate or invalid slide layout handling,
-- workbook/output metadata returned by the tool,
-- file persistence and lifecycle,
+- exact success output payload structure,
+- file persistence/path/reference details after the `system.files` append,
 - error payload structure.
 
 ## Related verification
