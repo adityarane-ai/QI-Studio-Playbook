@@ -12,12 +12,14 @@ The playbook is designed for two audiences:
 ### Orchestration primitives
 
 - [Agent Node](./02-Orchestration-Primitives/Agent.md)
+- [Approval Node](./02-Orchestration-Primitives/Approval.md)
 - [Rule Node](./02-Orchestration-Primitives/Rule.md)
 - [Variable Update Node](./02-Orchestration-Primitives/Variable-Update.md)
 - [Script Node](./02-Orchestration-Primitives/Script.md)
 
 ### Evidence records
 
+- [Approval Node Evidence](./03-Evidence/Approval-Node-Evidence.md)
 - [Rule Node Evidence](./03-Evidence/Rule-Node-Evidence.md)
 - [Variable Update Node Evidence](./03-Evidence/Variable-Update-Node-Evidence.md)
 - [Script Node Evidence](./03-Evidence/Script-Node-Evidence.md)
