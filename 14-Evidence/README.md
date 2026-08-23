@@ -1,44 +1,46 @@
-# Evidence Repository
+# Evidence Index
 
-Evidence is first-class. Raw screenshots are not enough; every evidence item should explain what the screenshot or experiment establishes.
+Evidence is treated as a first-class part of the playbook.
 
-## Evidence lifecycle
+## Evidence hierarchy
 
-```mermaid
-flowchart TD
-    S[Screenshot / Observation] --> I[Evidence Record]
-    I --> C[Capability Page]
-    C --> P[Pattern / Anti-pattern]
-    P --> A[Application Architecture]
-    A --> T[Regression Test]
-    T --> V[Version History]
+```text
+Screenshot / UI observation
+        ↓
+Evidence record
+        ↓
+Capability documentation
+        ↓
+Experiment
+        ↓
+Validated pattern
+        ↓
+Architecture guidance
 ```
 
-## Evidence record template
+## Evidence classes
 
-```yaml
-id:
-title:
-date:
-source:
-type: screenshot | experiment | runtime | documentation
-status: CONFIRMED | TESTED | DOCUMENTED | INFERRED | UNKNOWN
-capability:
-what_is_visible:
-what_it_proves:
-what_it_does_not_prove:
-related_pages: []
-related_tests: []
-observations: []
-failures: []
-workarounds: []
-open_questions: []
-```
+- **CONFIRMED**: visible or directly reproducible in QI Studio.
+- **TESTED**: implemented and observed at runtime.
+- **DOCUMENTED**: explicitly stated by authoritative product documentation.
+- **INFERRED**: architectural conclusion from evidence.
+- **UNKNOWN**: not yet established.
 
-## Important rule
+## Current records
 
-A screenshot showing a UI option proves that the option exists. It does not by itself prove its runtime semantics, limits, failure behavior, persistence, or interaction with other nodes. Those require testing or authoritative documentation.
+- [EVID-START-001: START Node and Runtime API](EVID-START-001.md)
 
-## Current evidence intake
+## Screenshot policy
 
-Future QI Studio screenshot uploads should be indexed here and then reflected into the affected capability pages. Do not leave important knowledge trapped in raw screenshots.
+Raw screenshots should be retained where practical, but screenshots are not the knowledge layer by themselves. Every useful screenshot batch must receive a structured evidence record describing what it proves and what it does not prove.
+
+## Change policy
+
+When later screenshots contradict earlier evidence:
+
+1. preserve the older record;
+2. create a new evidence record;
+3. explain the changed behavior;
+4. update the canonical capability page;
+5. update affected patterns and anti-patterns;
+6. update the changelog.
