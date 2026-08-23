@@ -32,10 +32,16 @@ The playbook is designed for two audiences:
 - [Additional Node Evidence](./03-Evidence/2026-08-23-Additional-Node-Evidence.md)
 - [Agent Node Evidence](./14-Evidence/2026-08-23-Agent-Node.md)
 - [Agent Screenshot Evidence Index](./14-Evidence/2026-08-23-Agent-Node-Screenshot-Index.md)
+- [Agent Tool Catalog](./14-Evidence/2026-08-23-Agent-Tool-Catalog.md)
+- [Start + Human Input + Output End-to-End Tests](./14-Evidence/2026-08-23-Start-HumanInput-Output-End-to-End-Tests.md)
 
 ### Verification
 
 - [Live Verification Queue](./04-Verification/Verification-Queue.md)
+
+### Current understanding
+
+- [Current Understanding & Verification Ledger](./05-Current-Understanding/Current-Understanding-and-Verification-Ledger.md)
 
 ## Documentation standard
 
@@ -44,6 +50,7 @@ Every QI Studio capability should distinguish between:
 - **Observed**: directly visible in screenshots or UI.
 - **Documented**: explicitly stated in QI Studio/product guidance.
 - **Verified**: confirmed by a reproducible runtime test.
+- **Runtime Confirmed**: confirmed through execution and downstream/user-visible consumption.
 - **Inferred**: a reasonable engineering interpretation that has not yet been proven.
 - **Open Question**: behavior that still needs investigation.
 
@@ -97,7 +104,7 @@ flowchart LR
 
 The core nodes with dedicated pages are Start, Agent, Approval, Decision Tree, Human Input, Rule, Variable Update, and Script. Additional capability families identified in the broader QI Studio work are consolidated in [Additional Observed Nodes](./02-Orchestration-Primitives/Additional-Observed-Nodes.md) until dedicated configuration captures are available.
 
-See [Additional Node Evidence](./03-Evidence/2026-08-23-Additional-Node-Evidence.md) for the evidence boundary and remaining work, and [Live Verification Queue](./04-Verification/Verification-Queue.md) for behavior that is documented or observed but still requires runtime confirmation.
+See [Additional Node Evidence](./03-Evidence/2026-08-23-Additional-Node-Evidence.md) for the evidence boundary and remaining work, [Current Understanding & Verification Ledger](./05-Current-Understanding/Current-Understanding-and-Verification-Ledger.md) for the current truth boundary, and [Live Verification Queue](./04-Verification/Verification-Queue.md) for behavior that is documented or observed but still requires runtime confirmation.
 
 ## Core principle
 
