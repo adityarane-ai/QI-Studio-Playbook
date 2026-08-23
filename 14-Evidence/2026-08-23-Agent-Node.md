@@ -239,15 +239,61 @@ search_table_data
 
 **Runtime questions:** Exact relevance/ranking behavior, memory scope, persistence timing, duplicate handling, and result object schema beyond the displayed description remain to be tested.
 
+### 6. Save Memory
+
+**Tool name:** `save_memory`
+
+**Purpose:** Saves a concise, durable fact for use in future conversations. The configured description explicitly frames the memory as a stable user preference, decision, or key detail rather than transient chit-chat.
+
+**Configured rules shown:**
+
+- Save one atomic fact per call, phrased so it remains useful later.
+- Recall first to avoid saving a duplicate.
+- Never save secrets, credentials, or sensitive personal data.
+- Scope is applied automatically by the system and should not be included in `content`.
+
+**Parameter observed:**
+
+| Parameter | Type | Observed purpose |
+|---|---|---|
+| `content` | string | The single, self-contained fact to remember. |
+
+**Advanced settings observed:** Include Thoughts ON; Response Filtering = Exclude Fields; Store Tool Output OFF; Return Direct OFF; Human-in-the-Loop OFF.
+
+**Status:** Observed and documented from supplied UI screenshot.
+
+**Runtime questions:** Exact save result/return shape, duplicate detection behavior, persistence timing, normalization, maximum content size, and failure behavior remain to be tested.
+
+### 7. Update Memory
+
+**Tool name:** `update_memory`
+
+**Purpose:** Updates the content of an existing memory identified by `memoryId`, replacing the stored fact while preserving its scope. The configured description says to use this instead of saving a near-duplicate when a known fact has changed.
+
+**Parameters observed:**
+
+| Parameter | Type | Observed purpose |
+|---|---|---|
+| `memoryId` | string | The memory identifier to update, exactly as returned by a prior recall. |
+| `content` | string | The new content that replaces the existing memory. |
+
+**Operating rule shown:** `memoryId` is expected to come from a prior recall and should not be invented or modified.
+
+**Status:** Observed and documented from supplied UI screenshot.
+
+**Runtime questions:** Exact update result/return shape, behavior for nonexistent or unauthorized `memoryId`, atomicity, persistence timing, and whether scope is always preserved have not been established.
+
 ## Updated evidence interpretation
 
-The screenshots now establish detailed configuration-level evidence for the following Agent tools:
+The screenshots establish detailed configuration-level evidence for the following Agent tools:
 
 - `get_reference_file`
 - `get_table_schema`
 - `resolve_field_value`
 - `search_table_data`
 - `recall_memory`
+- `save_memory`
+- `update_memory`
 
 They do **not** by themselves establish full runtime behavior. Runtime claims remain subject to the Verification Queue.
 
