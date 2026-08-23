@@ -1,101 +1,97 @@
 # QI Studio Playbook
 
-A living, evidence-backed operating manual for QI Studio. The repository separates **canonical explanations**, **evidence**, **active verification**, and the **current truth boundary** so that tested behavior does not get mixed with assumptions.
+An evidence-backed operating manual for understanding, testing, and designing QI Studio workflows.
 
-## Repository map
+The repository is being rebuilt around a strict separation between **governance, product model, canonical reference, evidence, verification, current truth, and test design**.
 
-### Canonical node documentation
+## New architecture
 
-- [Start](./02-Orchestration-Primitives/Start.md)
-- [Agent](./02-Orchestration-Primitives/Agent.md)
-- [Approval](./02-Orchestration-Primitives/Approval.md)
-- [Decision Tree](./02-Orchestration-Primitives/Decision-Tree.md)
-- [Human Input](./02-Orchestration-Primitives/Human-Input.md)
-- [Rule](./02-Orchestration-Primitives/Rule.md)
-- [Variable Update](./02-Orchestration-Primitives/Variable-Update.md)
-- [Script](./02-Orchestration-Primitives/Script.md)
-- [Additional Observed Nodes](./02-Orchestration-Primitives/Additional-Observed-Nodes.md)
+```text
+01 Governance
+      ↓
+02 Product Model
+      ↓
+03 Canonical Reference
+      ↓
+04 Evidence
+      ↓
+05 Verification
+      ↓
+06 Current Truth
+      ↓
+07 Test Lab
+      ↓
+99 Legacy
+```
 
-### Evidence
+### 01 Governance
+Rules for evidence, documentation ownership, repository maintenance, and AI interpretation.
 
-- [Agent Node Evidence](./03-Evidence/Agent-Node-Evidence.md)
-- [Agent Tool Catalog](./03-Evidence/Agent-Tool-Catalog.md)
-- [Start → Human Input → Output E2E](./03-Evidence/Start-HumanInput-Output-E2E.md)
-- [Approval Evidence](./03-Evidence/Approval-Node-Evidence.md)
-- [Decision Tree Evidence](./03-Evidence/Decision-Tree-Node-Evidence.md)
-- [Human Input Evidence](./03-Evidence/Human-Input-Node-Evidence.md)
-- [Rule Evidence](./03-Evidence/Rule-Node-Evidence.md)
-- [Variable Update Evidence](./03-Evidence/Variable-Update-Node-Evidence.md)
-- [Script Evidence](./03-Evidence/Script-Node-Evidence.md)
-- [Additional Node Evidence](./03-Evidence/2026-08-23-Additional-Node-Evidence.md)
+### 02 Product Model
+The conceptual map of QI Studio: node taxonomy, state/variable model, Agent capability model, and tool/integration model.
 
-### Verification
+### 03 Canonical Reference
+The current maintained explanation of each node and tool capability. This is where a reader should learn how the product currently works.
 
-- [Verification Queue](./04-Verification/Verification-Queue.md)
-- [Export Excel V2](./04-Verification/Export-Excel-V2-Verification.md)
-- [Export PowerPoint V2](./04-Verification/Export-PowerPoint-V2-Verification.md)
-- [Export PDF V2](./04-Verification/Export-PDF-V2-Verification.md)
-- [Export Word V2](./04-Verification/Export-Word-V2-Verification.md)
-- [Export HTML V2](./04-Verification/Export-HTML-V2-Verification.md)
-- [Extract Document to Markdown](./04-Verification/Extract-Document-to-Markdown-Verification.md)
-- [Web Search](./04-Verification/Web-Search-Verification.md)
-- [Memory Store/Retrieve](./04-Verification/Memory-Store-Retrieve-Verification.md)
-- [Conversation Attachment](./04-Verification/Conversation-Attachment-Verification.md)
-- [Send Email](./04-Verification/Send-Email-Verification.md)
-- [Agent Memory Tools](./04-Verification/Agent-Memory-Tools-Verification.md)
+### 04 Evidence
+The proof layer. Contains runtime tests, UI observations, supplied product guidance, and tool contracts.
 
-### Current truth boundary
+### 05 Verification
+Active unresolved questions only. Resolved items leave this layer.
 
-- [Current Understanding & Verification Ledger](./05-Current-Understanding/Current-Understanding-and-Verification-Ledger.md)
+### 06 Current Truth
+A compact control tower showing what is currently established and what needs attention next.
+
+### 07 Test Lab
+Test strategy, efficient test suites, reusable fixtures, and test designs. Executed results are stored in Evidence.
+
+### 99 Legacy
+Temporary migration boundary for the previous repository structure. Nothing here is authoritative.
+
+## Knowledge lifecycle
+
+```mermaid
+flowchart LR
+    E[Observation / documentation] --> M[Product model]
+    M --> C[Canonical reference]
+    C --> V[Verification question]
+    V --> T[Test Lab]
+    T --> R[Runtime execution]
+    R --> P[Evidence]
+    P --> C
+    P --> CT[Current Truth]
+    P -->|still unresolved| V
+```
 
 ## Evidence states
 
 | State | Meaning |
 |---|---|
-| **Observed** | Visible in the QI Studio UI/screenshots. |
-| **Documented** | Explicitly stated in supplied product guidance. |
-| **Runtime Confirmed** | Reproduced in execution and consumed downstream or shown to the user. |
-| **Open** | Still requires a controlled test or stronger evidence. |
+| **Observed** | Visible in UI, screenshots, runtime envelope, or supplied artifact. |
+| **Documented** | Explicitly stated in authoritative product guidance. |
+| **Runtime Confirmed** | Reproduced by a controlled runtime test with recorded evidence. |
+| **Open** | Not sufficiently established yet. |
 
-Never promote an observation or inference to Runtime Confirmed without a reproducible test.
+A claim may be both Observed and Documented. Runtime confirmation requires an actual test.
 
-## Evidence lifecycle
+## Non-duplication rule
 
-```mermaid
-flowchart LR
-    E[UI / product evidence] --> C[Canonical documentation]
-    C --> Q[Open verification item]
-    Q --> T[Controlled runtime test]
-    T -->|Confirmed| C
-    T -->|Still unknown| Q
-    T -->|Contradicted| C
-```
-
-## Conversation-to-Git rule
-
-Substantive QI Studio knowledge established during investigation belongs in this repository: node behavior, configuration, tool contracts, test results, failures, workarounds, design patterns, diagrams, and open questions.
-
-The preferred path is:
+Each important fact has one canonical owner.
 
 ```text
-Evidence
-  ↓
-Canonical explanation + evidence record
-  ↓
-Verification item when needed
-  ↓
-Runtime test
-  ↓
-Update canonical truth
+Explanation   → 03 Canonical Reference
+Proof          → 04 Evidence
+Open question  → 05 Verification
+Snapshot       → 06 Current Truth
+Test design    → 07 Test Lab
 ```
 
-## Structural rule
+Do not maintain parallel copies of the same knowledge as separate sources of truth.
 
-Use one canonical location for each knowledge class:
+## Rebuild status
 
-- `02-Orchestration-Primitives/` for explanations.
-- `03-Evidence/` for evidence and runtime tests.
-- `04-Verification/` for unresolved questions only.
-- `05-Current-Understanding/` for the present truth boundary.
+The new structure has been established on branch `restructure/repo-foundation`.
 
-Do not maintain a second parallel evidence directory for the same capability.
+The existing material is intentionally not yet deleted. The next phase will migrate useful content into the new ownership model, consolidate duplicates, correct contradictions, and retire the old structure only after the rebuilt references are validated.
+
+See [01 Governance/Documentation-Architecture](./01-Governance/Documentation-Architecture.md) and [06 Current Truth](./06-Current-Truth/README.md) for the operating rules.
