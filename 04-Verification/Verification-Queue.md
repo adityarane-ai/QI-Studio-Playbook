@@ -191,6 +191,70 @@ Do **not** keep verified items in this queue as historical clutter. Git history 
 
 ---
 
+## Human Input
+
+### HI-001: Response serialization
+
+**Current understanding:** Human Input asks a person a question and stores the response. The UI exposes output variable `input` with type `object` and description `The user's input response`.
+
+**Needs verification:** Exact runtime shape and serialization of `input`, including whether free-text input is represented as an object with a text/value field or another structure.
+
+**Test:** Submit controlled free-text responses of different lengths and inspect the downstream output/state.
+
+**Target evidence:** `03-Evidence/Human-Input-Node-Evidence.md`
+
+### HI-002: Save Response As variable resolution
+
+**Current understanding:** The UI lets the designer select a variable target and displays `variableTarget` as the flow variable path where input was stored. The example target is `system / humanInput`.
+
+**Needs verification:** Exact path resolution, whether missing variables are created automatically, and behavior when a target already exists.
+
+**Test:** Use new, existing, nested, and differently scoped targets and inspect resulting state.
+
+**Target evidence:** `03-Evidence/Human-Input-Node-Evidence.md`
+
+### HI-003: State Update ordering
+
+**Current understanding:** Human Input exposes Advanced > State Update in addition to saving the response.
+
+**Needs verification:** Whether state updates execute before or after response persistence, and what value later steps observe when both touch related keys.
+
+**Test:** Configure a State Update that writes a related key, capture Human Input, and inspect final state and downstream reads.
+
+**Target evidence:** `03-Evidence/Human-Input-Node-Evidence.md`
+
+### HI-004: Timeout, abandonment, and resume
+
+**Current understanding:** Human Input pauses the orchestration while waiting for a person to respond.
+
+**Needs verification:** Timeout behavior, abandonment handling, resume behavior, and state persistence across a delayed response.
+
+**Test:** Leave the node waiting, resume after a controlled delay, and test abandoned/no-response scenarios.
+
+**Target evidence:** `03-Evidence/Human-Input-Node-Evidence.md`
+
+### HI-005: Downstream availability
+
+**Current understanding:** The guidance says later steps can read the stored response and that an Agent/LLM or Rule can use it.
+
+**Needs verification:** Exact downstream reference syntax, when the value becomes available, and how it behaves across Agent, Rule, and other nodes.
+
+**Test:** Consume the Human Input result from multiple downstream node types and inspect the exact resolved values.
+
+**Target evidence:** `03-Evidence/Human-Input-Node-Evidence.md`
+
+### HI-006: Input/output relation
+
+**Current understanding:** The UI exposes both `input` and `variableTarget` as output variables.
+
+**Needs verification:** Whether `variableTarget` contains the literal configured path, a normalized path, or runtime metadata, and whether `input` always corresponds exactly to what was written to that target.
+
+**Test:** Compare the output object with the resolved target value across several target paths.
+
+**Target evidence:** `03-Evidence/Human-Input-Node-Evidence.md`
+
+---
+
 ## Script
 
 ### SC-001: JavaScript runtime version and globals
