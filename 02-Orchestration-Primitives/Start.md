@@ -1,67 +1,75 @@
 # Start Node
 
-> **Evidence status:** OBSERVED + DOCUMENTED
+> **Evidence status:** Runtime Confirmed for the tested invocation path.
 > **Evidence date:** 2026-08-23
-> **Primary evidence:** User-supplied QI Studio orchestration screenshots and product guidance from the current project conversation.
+> **Primary evidence:** User-supplied QI Studio screenshots and runtime execution records.
 
-The **Start** node is the entry point of a QI Studio orchestration. It establishes where the workflow begins and exposes the initial workflow inputs visible in the supplied orchestration canvas.
+The **Start** node is the entry boundary of a QI Studio orchestration. It receives the invocation and initializes the tested workflow execution context.
 
-## Observed configuration
+## 1. Runtime-confirmed observations
 
-The supplied canvas shows a Start step with an **Entry point** indicator. The visible input surface includes values such as:
+A controlled Start → Human Input → Output test showed:
 
-- `message`
-- `attachments`
-- `ui_action`
+```text
+nodes.start.marker = "START"
+nodes.start.interface.inputs.message = "hello"
+nodes.start.success = true
+nodes.start.options.sessionId = <session id>
+nodes.start.options.streamMode = "verbose"
+nodes.start.timestamp = <runtime timestamp>
+nodes.start.nodeId = "start"
+nodes.start.nodeType = "start"
+```
 
-The exact full input contract should be confirmed through the runtime variable browser and node schema in the current QI Studio build.
+The execution completed successfully after downstream Human Input and Output steps.
 
-## Conceptual role
+## 2. Conceptual role
 
 ```mermaid
 flowchart LR
-    I[External / user invocation] --> S[Start]
-    S --> N[First orchestration step]
+    I[User / external invocation] --> S[Start]
+    S --> N[First workflow step]
 ```
 
-Start should be treated as an intake boundary, not as a place to encode business logic.
+Start is an intake boundary, not the place for business logic.
 
-## Design guidance
+## 3. Observed input surface
 
-Use Start to establish the initial context passed into the workflow. Validate and normalize inputs in explicit downstream steps.
+The supplied UI/runtime evidence references invocation data including:
+
+- message
+- attachments
+- UI action information
+
+The complete Start input contract and exact requiredness of every field remain unverified.
+
+## 4. Design guidance
 
 Prefer:
 
 ```text
 Start
   ↓
-Input validation / normalization
+Validation / normalization
   ↓
-Decision / Agent / Tool / Subflow
+Agent / Rule / Script / Tool / Subflow
 ```
 
-over putting extensive transformation logic directly into the invocation contract.
+Do not overload Start with transformations that belong in explicit downstream primitives.
 
-## Important distinctions
+## 5. Important distinction
 
-- **Start inputs** are invocation data.
-- **Variables** are workflow state.
-- **Artifacts** are structured, versionable outputs.
+Start execution success does **not** guarantee user-visible completion.
 
-Do not assume that every Start input should become persistent state.
+The historical regression in the canonical E2E test proves that an upstream flow can complete without a usable Output response source.
 
-## Open questions
+See [Start → Human Input → Output E2E Evidence](../03-Evidence/Start-HumanInput-Output-E2E.md).
 
-- Exact schema and requiredness of every built-in Start input.
-- Exact representation of attachments and UI actions.
-- Whether custom Start inputs are supported and how they are typed.
-- Input validation behavior before the first downstream node executes.
-- Whether multiple entry-point invocation modes produce different initial metadata.
+## 6. Still unverified
 
-## AI-agent interpretation rules
-
-1. Treat Start as the orchestration entry boundary.
-2. Read only the inputs actually exposed by the current workflow invocation.
-3. Do not invent built-in input names or types.
-4. Move normalization, validation, and business logic into explicit downstream primitives.
-5. Preserve uncertainty around undocumented invocation metadata until runtime-tested.
+- Complete Start input schema.
+- Required vs optional invocation fields.
+- Exact attachments representation.
+- Exact UI-action representation.
+- Custom Start inputs, if supported.
+- Differences between entry/invocation modes.
