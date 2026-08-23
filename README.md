@@ -2,9 +2,9 @@
 
 An evidence-backed operating manual for understanding, testing, and designing QI Studio workflows.
 
-The repository is being rebuilt around a strict separation between **governance, product model, canonical reference, evidence, verification, current truth, and test design**.
+The repository uses a strict knowledge-ownership model so that explanation, evidence, unresolved questions, current truth, and test design do not become competing sources of truth.
 
-## New architecture
+## Final architecture
 
 ```text
 01 Governance
@@ -20,47 +20,42 @@ The repository is being rebuilt around a strict separation between **governance,
 06 Current Truth
       ↓
 07 Test Lab
-      ↓
-99 Legacy
 ```
 
 ### 01 Governance
-Rules for evidence, documentation ownership, repository maintenance, and AI interpretation.
+Rules for evidence, documentation ownership, repository maintenance, migration, and AI interpretation.
 
 ### 02 Product Model
-The conceptual map of QI Studio: node taxonomy, state/variable model, Agent capability model, and tool/integration model.
+Conceptual models for node taxonomy, variables/state, Agent capabilities, and tool/integration boundaries.
 
 ### 03 Canonical Reference
-The current maintained explanation of each node and tool capability. This is where a reader should learn how the product currently works.
+The maintained explanation of how each documented node or capability works. This is the primary learning layer.
 
 ### 04 Evidence
-The proof layer. Contains runtime tests, UI observations, supplied product guidance, and tool contracts.
+Proof and source material: UI observations, supplied product guidance, runtime tests, and tool contracts.
 
 ### 05 Verification
-Active unresolved questions only. Resolved items leave this layer.
+Active unresolved questions only. When a question is confirmed, its result is promoted to evidence/canonical documentation and removed from this queue.
 
 ### 06 Current Truth
 A compact control tower showing what is currently established and what needs attention next.
 
 ### 07 Test Lab
-Test strategy, efficient test suites, reusable fixtures, and test designs. Executed results are stored in Evidence.
-
-### 99 Legacy
-Temporary migration boundary for the previous repository structure. Nothing here is authoritative.
+Test strategy and reusable test designs. Executed results belong in `04-Evidence`.
 
 ## Knowledge lifecycle
 
 ```mermaid
 flowchart LR
-    E[Observation / documentation] --> M[Product model]
+    O[Observation / documentation] --> M[Product model]
     M --> C[Canonical reference]
-    C --> V[Verification question]
-    V --> T[Test Lab]
+    C --> Q[Open verification question]
+    Q --> T[Test Lab]
     T --> R[Runtime execution]
-    R --> P[Evidence]
-    P --> C
-    P --> CT[Current Truth]
-    P -->|still unresolved| V
+    R --> E[Evidence]
+    E --> C
+    E --> CT[Current Truth]
+    E -->|still unresolved| Q
 ```
 
 ## Evidence states
@@ -76,7 +71,7 @@ A claim may be both Observed and Documented. Runtime confirmation requires an ac
 
 ## Non-duplication rule
 
-Each important fact has one canonical owner.
+Each important fact has one canonical owner:
 
 ```text
 Explanation   → 03 Canonical Reference
@@ -86,12 +81,12 @@ Snapshot       → 06 Current Truth
 Test design    → 07 Test Lab
 ```
 
-Do not maintain parallel copies of the same knowledge as separate sources of truth.
+Do not keep parallel copies of the same explanation or verification queue.
 
-## Rebuild status
+## Current status
 
-The new structure has been established on branch `restructure/repo-foundation`.
+The repository migration is now being consolidated on the default `main` branch. Legacy duplicate node and evidence locations have been moved into the new ownership model and removed where their unique information had already been preserved.
 
-The existing material is intentionally not yet deleted. The next phase will migrate useful content into the new ownership model, consolidate duplicates, correct contradictions, and retire the old structure only after the rebuilt references are validated.
+Start, Human Input, Approval, Decision Tree, Rule, Script, Variable Update and Agent now have canonical node references under `03-Canonical-Reference/Nodes/`. Runtime/UI/tool evidence is under `04-Evidence/`. Active verification questions are under `05-Verification/`. Current status is maintained in `06-Current-Truth/Current-Truth.md`.
 
-See [01 Governance/Documentation-Architecture](./01-Governance/Documentation-Architecture.md) and [06 Current Truth](./06-Current-Truth/README.md) for the operating rules.
+See `01-Governance/Documentation-Architecture.md` and `01-Governance/Migration-Map.md` for the operating rules.
