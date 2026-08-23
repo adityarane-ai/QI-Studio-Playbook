@@ -31,6 +31,10 @@ The playbook is designed for two audiences:
 - [Agent Node Evidence](./14-Evidence/2026-08-23-Agent-Node.md)
 - [Agent Screenshot Evidence Index](./14-Evidence/2026-08-23-Agent-Node-Screenshot-Index.md)
 
+### Verification
+
+- [Live Verification Queue](./04-Verification/Verification-Queue.md)
+
 ## Documentation standard
 
 Every QI Studio capability should distinguish between:
@@ -58,6 +62,8 @@ Create / update canonical node documentation
       ↓
 Create / update evidence record
       ↓
+Update verification queue when needed
+      ↓
 Update index / cross-links
       ↓
 Commit to Git
@@ -69,26 +75,27 @@ When a screenshot batch introduces a new node or capability, the expected reposi
 
 1. canonical node documentation
 2. evidence record
-3. README/index cross-link
-4. explicit open questions where runtime semantics are not yet verified
+3. verification-queue entry for anything still unverified
+4. README/index cross-link
+5. explicit open questions where runtime semantics are not yet verified
 
 ## Evidence lifecycle
 
 ```mermaid
 flowchart LR
     E[New screenshot / product guidance] --> O[Observed / Documented]
-    O --> T[Runtime test]
+    O --> Q[Verification Queue]
+    Q --> T[Runtime test]
     T --> V[Verified]
-    V --> C[Canonical playbook entry]
-    O --> Q[Open Question]
-    Q --> T
+    V --> C[Canonical node + evidence]
+    T --> Q
 ```
 
 ## Current coverage boundary
 
 The core nodes with dedicated pages are Start, Agent, Approval, Decision Tree, Rule, Variable Update, and Script. Additional capability families identified in the broader QI Studio work are consolidated in [Additional Observed Nodes](./02-Orchestration-Primitives/Additional-Observed-Nodes.md) until dedicated configuration captures are available.
 
-See [Additional Node Evidence](./03-Evidence/2026-08-23-Additional-Node-Evidence.md) for the evidence boundary and remaining work.
+See [Additional Node Evidence](./03-Evidence/2026-08-23-Additional-Node-Evidence.md) for the evidence boundary and remaining work, and [Live Verification Queue](./04-Verification/Verification-Queue.md) for behavior that is documented or observed but still requires runtime confirmation.
 
 ## Core principle
 
