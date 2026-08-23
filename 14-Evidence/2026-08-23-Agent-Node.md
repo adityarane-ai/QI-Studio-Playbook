@@ -3,7 +3,7 @@
 **Evidence ID:** QI-OBS-2026-08-23-AGENT-001  
 **Date:** 2026-08-23  
 **Capability:** Agent strategy, model selection, prompt/message roles, tools/capabilities, advanced settings, context management, long-term memory, state updates, variable browser, outputs.  
-**Source:** User-supplied QI Studio screenshots.
+**Source:** User-supplied QI Studio screenshots and supplied tool configuration text.
 
 ## What was observed
 
@@ -28,11 +28,11 @@
 
 ## What this evidence proves
 
-It proves that these configuration controls, scopes, values, and output fields are present in the observed QI Studio build/UI.
+It proves that these configuration controls, scopes, values, and output fields are present in the observed QI Studio build/UI, plus the tool contracts documented below as supplied configuration evidence.
 
 ## What this evidence does not prove
 
-Screenshots alone do not establish exact runtime semantics for context replacement, dropping, thresholds, long-term-memory retrieval timing, error retries, guardrail sequencing, Include Thoughts payloads, transactionality of state updates, scoped-variable precedence, or Deep Agent scheduling/failure semantics.
+Screenshots and supplied configuration descriptions do not establish exact runtime semantics for context replacement, dropping, thresholds, long-term-memory retrieval timing, error retries, guardrail sequencing, Include Thoughts payloads, transactionality of state updates, scoped-variable precedence, Deep Agent scheduling/failure semantics, or the precise runtime behavior of export formatting and charts.
 
 ## Security note
 
@@ -54,7 +54,7 @@ The screenshots show fields named Authorization and RuntimeToken in the variable
 
 ## Agent Tool Evidence Captured
 
-The following tool configurations were subsequently supplied as screenshots. The records below document only what the screenshots establish and explicitly distinguish UI evidence from runtime assumptions.
+The following tool configurations were subsequently supplied as screenshots or explicit tool descriptions. The records below document only what the supplied evidence establishes and explicitly distinguish UI/configuration evidence from runtime assumptions.
 
 ### 1. Get Reference File
 
@@ -283,9 +283,103 @@ search_table_data
 
 **Runtime questions:** Exact update result/return shape, behavior for nonexistent or unauthorized `memoryId`, atomicity, persistence timing, and whether scope is always preserved have not been established.
 
+### 8. Export Excel V2
+
+**Tool name:** `export_excel_v2`
+
+**Purpose:** Generates a multi-sheet Excel `.xlsx` workbook from structured data. The supplied configuration description establishes the workbook structure, supported cell values, formulas, sheet options, formatting, conditional formatting, and chart definitions.
+
+**Core output rule:** The `filename` parameter is used as the output filename and should contain only letters, numbers, spaces, and hyphens.
+
+**Required per sheet:**
+
+| Field | Type | Observed rule |
+|---|---|---|
+| `name` | string | Sheet tab label. |
+| `data` | array | List of rows, where each row is a list of cell values. |
+
+**Allowed cell values:**
+
+- string: written as text.
+- number (integer/float): written as a number.
+- boolean: written as TRUE/FALSE.
+- ISO date string such as `2026-04-28`: written as a date.
+- formula string beginning with `=`: treated as an Excel formula using standard A1 references.
+- `null`: skipped, leaving an empty cell.
+
+**Formula examples supplied:**
+
+```text
+=SUM(B2:B5)
+=AVERAGE(C2:C10)
+=B2*C2
+=B2-C2
+=D2/B2
+=IF(B2>1000, "High", "Low")
+```
+
+**Workbook behavior shown:** The first sheet in the `sheets` list is active when the workbook opens.
+
+**Optional sheet fields:**
+
+| Field | Observed behavior |
+|---|---|
+| `headers` | Boolean; styles first row as a bold header. Default is auto-detected when the first row is all strings and later rows contain numbers. |
+| `freeze_panes` | Object such as `{ "row": 1, "col": 0 }`; freezes rows above and columns left of the specified cell. |
+| `autofilter` | Boolean; adds filter dropdowns to the header row and requires headers. |
+| `tab_color` | Hex string such as `#4472C4` for the sheet tab. |
+| `column_widths` | `auto` or an explicit list of widths. Auto sizing accounts for rendered formatted-number width. |
+
+**Formatting:**
+
+- `header_format` supports `bold`, `italic`, `bg_color`, `font_color`, `align`, and `font_size`.
+- Default header formatting shown: bold, blue background `#4472C4`, white font, centered.
+- `cell_formats` is a column-scoped list. Each item targets one or more zero-based columns across all data rows.
+- Common cell-format keys include `num_format`, `align`, `bold`, `italic`, `font_color`, and `bg_color`.
+- Percentage formats such as `0.0%` and `0.00%` expect stored values as fractions such as `0.85`, not `85`.
+- Common number/date formats include `#,##0`, `#,##0.00`, `$#,##0`, `$#,##0.00`, `0.0%`, `0.00%`, and `yyyy-mm-dd`.
+
+**Conditional formatting:**
+
+- `conditional_formats` is a list of highlight rules targeting zero-based columns.
+- Supported criteria shown: `>`, `<`, `>=`, `<=`, `==`, `!=`.
+- Multiple rules can stack on the same column.
+- Example traffic-light styles supplied include green, yellow, and red background/font combinations.
+
+**Charts:**
+
+`charts` is a list of chart definitions embedded in the sheet in which they are defined. Required keys are `type`, `categories_col`, `series_cols`, and `position`.
+
+Supported chart types shown:
+
+- `bar` - horizontal.
+- `column` - vertical.
+- `line`.
+- `pie`.
+
+Optional chart properties include `title`, `data_start_row`, `data_end_row`, `width`, and `height`. Series names are auto-read from the header row when `headers=true`. Default chart size shown is 480 x 288 pixels. `position` anchors the chart at a cell such as `F2` or `A10`.
+
+**Minimal structure supplied:**
+
+```text
+sheets=[
+  {"name":"Sales","data":[
+    ["Product","Revenue"],
+    ["Widget A",1000],
+    ["Widget B",2500],
+    ["Total","=SUM(B2:B3)"]
+  ]},
+  {"name":"Notes","data":[["Q1 review pending"]]}
+]
+```
+
+**Status:** Configuration contract supplied by the user and documented here as evidence. This is not yet a runtime-verified contract.
+
+**Runtime questions:** Exact parameter schema including whether any fields are mandatory beyond the documented per-sheet `name` and `data`, file naming sanitization behavior, formula calculation/recalculation behavior, exact date parsing/timezone handling, null/empty-string handling, formatting precedence, conditional-format evaluation timing, chart rendering compatibility, maximum workbook/sheet/row limits, behavior for malformed formulas or invalid formats, and returned output/file metadata remain to be tested.
+
 ## Updated evidence interpretation
 
-The screenshots establish detailed configuration-level evidence for the following Agent tools:
+The supplied evidence establishes detailed configuration-level evidence for the following Agent tools:
 
 - `get_reference_file`
 - `get_table_schema`
@@ -294,8 +388,9 @@ The screenshots establish detailed configuration-level evidence for the followin
 - `recall_memory`
 - `save_memory`
 - `update_memory`
+- `export_excel_v2`
 
-They do **not** by themselves establish full runtime behavior. Runtime claims remain subject to the Verification Queue.
+They do **not** by themselves establish full runtime behavior. Runtime claims remain subject to verification records.
 
 ## Related
 
@@ -303,3 +398,4 @@ They do **not** by themselves establish full runtime behavior. Runtime claims re
 - [Testing](../11-Testing/README.md)
 - [Tools](../04-Tools/README.md)
 - [Data and State](../05-Data-State/README.md)
+- [Excel V2 verification](../04-Verification/Excel-V2-Verification.md)
