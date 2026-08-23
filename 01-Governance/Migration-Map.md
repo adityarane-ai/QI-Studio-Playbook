@@ -1,8 +1,8 @@
 # Migration Map
 
-**Status:** Migration completed for the current repository material on `main` as of 2026-08-23.
+**Status:** Migration and cleanup completed for the current repository material on `main` as of 2026-08-23.
 
-The repository was rebuilt around clear ownership boundaries. Redundant legacy copies were removed only after their useful information had been migrated into the new structure.
+The repository is now organized around explicit ownership boundaries. Useful information from the former structure was migrated into its final owner, duplicate copies were consolidated, and obsolete migration placeholders were removed.
 
 | Former location | Final owner | Result |
 |---|---|---|
@@ -12,8 +12,9 @@ The repository was rebuilt around clear ownership boundaries. Redundant legacy c
 | `03-Evidence/Agent-Tool-Catalog.md` | `04-Evidence/Tool-Contracts/Agent-Tool-Catalog.md` | Migrated and old copy removed |
 | `04-Verification/*` | `05-Verification/Verification-Queue.md` | Consolidated into one active queue; old layer removed |
 | `05-Current-Understanding/Current-Understanding-and-Verification-Ledger.md` | `06-Current-Truth/Current-Truth.md` | Consolidated into control tower; old layer removed |
+| `03-Canonical-Reference/{Approval,Compute,Condition}-Node.md` | `03-Canonical-Reference/Nodes/` | Moved into the single canonical Nodes collection; duplicate root copies removed |
+| `99-Legacy/*` | None | Retired and deleted after migration |
 | `README.md` | `README.md` | Rewritten for final architecture |
-| `99-Legacy/*` | None | Retired after migration; no longer authoritative |
 
 ## Final ownership
 
@@ -27,4 +28,6 @@ Test design   → 07-Test-Lab
 
 ## Cleanup rule
 
-Do not reintroduce parallel copies of canonical explanations or verification queues. When a new runtime test confirms an open question, add the proof to `04-Evidence`, update the canonical reference, remove the question from `05-Verification`, and retain the historical test result.
+Do not reintroduce parallel copies of canonical explanations or verification queues. When a new runtime test confirms an open question, add the proof to `04-Evidence`, update the relevant canonical reference, remove the question from `05-Verification`, and retain historical test results in evidence/history.
+
+Empty placeholder directories should not be preserved in Git simply for structure. A directory exists only when it contains maintained material.
