@@ -1,47 +1,37 @@
-# Additional Node Evidence Record
+# Additional Node Evidence
 
 **Evidence date:** 2026-08-23  
-**Source:** QI Studio screenshots, product guidance, and earlier documentation work in this project conversation.
+**Status:** Capability-level evidence boundary; runtime verification is intentionally incomplete for these additional node families.
 
-## Current evidence status
+This file exists only for node families that do not yet have dedicated configuration evidence comparable to the core primitive pages.
 
-| Capability | Status | Repository page |
+| Capability | Current status | Canonical location |
 |---|---|---|
-| Start | Observed + documented | `02-Orchestration-Primitives/Start.md` |
-| Agent | Observed + documented | `02-Orchestration-Primitives/Agent.md` |
-| Approval | Observed + documented | `02-Orchestration-Primitives/Approval.md` |
-| Decision Tree | Observed + documented | `02-Orchestration-Primitives/Decision-Tree.md` |
-| Rule | Observed + documented | `02-Orchestration-Primitives/Rule.md` |
-| Variable Update | Observed + documented | `02-Orchestration-Primitives/Variable-Update.md` |
-| Script | Observed + documented | `02-Orchestration-Primitives/Script.md` |
-| LLM | Broader capability observed, deeper node evidence pending | `02-Orchestration-Primitives/Additional-Observed-Nodes.md` |
-| External Agent | Broader capability observed, deeper node evidence pending | same |
-| Compute | Broader capability observed, deeper node evidence pending | same |
-| Subflow | Broader capability observed, deeper node evidence pending | same |
-| Handoff | Broader capability observed, deeper node evidence pending | same |
-| Guardrail | Broader capability observed, deeper node evidence pending | same |
-| Human Input | Broader capability observed, deeper node evidence pending | same |
-| Output | Broader capability observed, deeper node evidence pending | same |
+| LLM | Observed at capability level; detailed UI/runtime evidence pending | `02-Orchestration-Primitives/Additional-Observed-Nodes.md` |
+| External Agent | Observed at capability level; detailed UI/runtime evidence pending | same |
+| Compute | Observed at capability level; detailed UI/runtime evidence pending | same |
+| Subflow | Observed at capability level; detailed UI/runtime evidence pending | same |
+| Handoff | Observed at capability level; detailed UI/runtime evidence pending | same |
+| Guardrail | Observed at capability level; detailed UI/runtime evidence pending | same |
+| Output | Capability observed; expression/runtime contract still being mapped | same |
+
+**Human Input is not listed here anymore.** It has dedicated evidence and runtime-confirmed end-to-end tests.
 
 ## Evidence boundary
 
-For the first seven entries, this repository now contains dedicated capability documentation and evidence records where applicable.
+For these additional capabilities, do not infer exact configuration fields, output schemas, routing semantics, persistence behavior, or error handling from general concepts alone.
 
-For the additional nodes, the current repository records only the capability-level understanding established through the broader QI Studio work. Their exact configuration surfaces and runtime semantics still need dedicated screenshots and tests before being promoted to fully verified documentation.
+When a capability is next investigated, capture:
 
-## Required next evidence for each pending node
-
-Capture the node configuration panel and record:
-
-1. inputs
-2. outputs
-3. visible advanced settings
+1. configuration UI
+2. visible inputs and outputs
+3. advanced settings
 4. state updates
 5. output variables
 6. routing handles
-7. error behavior
-8. test result
-9. runtime limitations
-10. examples and failure modes
+7. runtime execution
+8. downstream consumption
+9. failure behavior
+10. user-visible result where applicable
 
-Do not fill missing details from assumptions.
+Only then promote the capability into a dedicated canonical node/evidence record.
